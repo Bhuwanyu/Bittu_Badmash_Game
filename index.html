@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | Bittu Badmash</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -51,7 +51,7 @@
         updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
+      var buildUrl = ".";
       var loaderUrl = buildUrl + "/Itch Builds.loader.js";
       var config = {
         arguments: [],
@@ -104,8 +104,17 @@
 
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "540px";
-        canvas.style.height = "960px";
+        // Fit the 540x960 game inside any window or iframe, keeping its shape.
+        document.querySelector("#unity-footer").style.display = "none";
+        document.body.style.background = "#17120F";
+        document.body.style.overflow = "hidden";
+        function fitCanvas() {
+          var s = Math.min(window.innerWidth / 540, window.innerHeight / 960);
+          canvas.style.width = Math.floor(540 * s) + "px";
+          canvas.style.height = Math.floor(960 * s) + "px";
+        }
+        fitCanvas();
+        window.addEventListener("resize", fitCanvas);
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
