@@ -117,15 +117,23 @@
         window.addEventListener("resize", fitCanvas);
       }
 
-      document.querySelector("#unity-loading-bar").style.display = "block";
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      loadingBar.style.display = "block";
+      // Hide the Unity logo/loading bar. Unity's own "done" signal doesn't always arrive on
+      // iPhone browsers, so also hide it shortly after loading reaches 100% or on the first tap.
+      var hideTimer = null;
+      function hideLoadingBar() { loadingBar.style.display = "none"; }
+      canvas.addEventListener("pointerdown", hideLoadingBar, { once: true });
+      loadingBar.addEventListener("pointerdown", hideLoadingBar, { once: true });
 
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+          if (progress >= 1 && !hideTimer) hideTimer = setTimeout(hideLoadingBar, 1500);
               }).then((unityInstance) => {
-                document.querySelector("#unity-loading-bar").style.display = "none";
+                hideLoadingBar();
                 document.querySelector("#unity-fullscreen-button").onclick = () => {
                   unityInstance.SetFullscreen(1);
                 };
